@@ -145,10 +145,10 @@ function decode_lic($buffer, $output = true)
  */
 function modify_expire(&$lic_info, $year, $month = 12, $day = 31)
 {
-    $lic_info{0x60} = pack('v', $year)[0];
-    $lic_info{0x61} = pack('v', $year)[1];
-    $lic_info{0x62} = chr($month);
-    $lic_info{0x63} = chr($day);
+    $lic_info[0x60] = pack('v', $year)[0];
+    $lic_info[0x61] = pack('v', $year)[1];
+    $lic_info[0x62] = chr($month);
+    $lic_info[0x63] = chr($day);
 }
 
 /**
@@ -203,10 +203,10 @@ function modify_mac(&$lic_info, $mac, $ip = '172.27.0.14')
     }
 
     $hash2 = hex2bin(str_pad(dechex(unpack('V', pack('N', ip2long($ip)))[1]), 0x8, '0', STR_PAD_LEFT));
-    $hash2{0} = chr(ord($hash2{0}) ^ ord($mac_hash{0}));
-    $hash2{1} = chr(ord($hash2{1}) ^ ord($mac_hash{1}));
-    $hash2{2} = chr(ord($hash2{2}) ^ ord($mac_hash{2}));
-    $hash2{3} = chr(ord($hash2{3}) ^ ord($mac_hash{3}));
+    $hash2[0] = chr(ord($hash2[0]) ^ ord($mac_hash[0]));
+    $hash2[1] = chr(ord($hash2[1]) ^ ord($mac_hash[1]));
+    $hash2[2] = chr(ord($hash2[2]) ^ ord($mac_hash[2]));
+    $hash2[3] = chr(ord($hash2[3]) ^ ord($mac_hash[3]));
     $hash2 = dechex(unpack('V', $hash2)[1]); // 用于lic绑定IP
 
 
@@ -215,7 +215,7 @@ function modify_mac(&$lic_info, $mac, $ip = '172.27.0.14')
         echo "(license " . $license . ")\n";
     }
     for ($i = 0x40; $i < 0x50; $i++) {
-        $lic_info{$i} = $license{$i - 0x40};
+        $lic_info[$i] = $license[$i - 0x40];
     }
 }
 
@@ -260,13 +260,13 @@ function modify_hash(&$lic_info, $version)
         // hex_dump($tmp);
         // hex_dump($hash_ret);
 
-        $lic_info{0x98} = pack('V', $hash)[0];
-        $lic_info{0x99} = pack('V', $hash)[1];
-        $lic_info{0x9A} = pack('V', $hash)[2];
-        $lic_info{0x9B} = pack('V', $hash)[3];
+        $lic_info[0x98] = pack('V', $hash)[0];
+        $lic_info[0x99] = pack('V', $hash)[1];
+        $lic_info[0x9A] = pack('V', $hash)[2];
+        $lic_info[0x9B] = pack('V', $hash)[3];
 
         for ($i = 0; $i < 0x20; $i++) {
-            $lic_info{$i} = $hash_ret{$i};
+            $lic_info[$i] = $hash_ret[$i];
         }
     }
 }
@@ -417,14 +417,14 @@ function APX_ProtDecrypt_New($Id, $IdLen, $Key, $KeyLen, $CipherText, $CipherTex
             do {
                 $v13 = $v12;
                 $v14 = 8 * $v12++;
-                $v11 = _INT32($v11 | (ord($CipherText{$v7 + $v13}) << $v14));
+                $v11 = _INT32($v11 | (ord($CipherText[$v7 + $v13]) << $v14));
             } while ($v12 < $v8 && $v12 <= 3);
             APX_ProtUpdateContext($ProtContext);
             $v15 = 0;
             $v16 = _INT32($v11 - $i - $ProtContext[0]);
             do {
                 $v17 = $v15++;
-                $OutPlainText{$v9 + $v17} = chr($v16 & 0xFF);
+                $OutPlainText[$v9 + $v17] = chr($v16 & 0xFF);
                 $v16 >>= 8;
             } while ($v15 < $v8 && $v15 <= 3);
             if ($v8 <= 4)
@@ -461,7 +461,7 @@ function APX_ProtEncrypt_New($Id, $IdLen, $Key, $KeyLen, $PlainText, $PlainTextL
             do {
                 $v13 = $v12;
                 $v14 = 8 * $v12++;
-                $v11 = _INT32($v11 | (ord($PlainText{$v7 + $v13}) << $v14));
+                $v11 = _INT32($v11 | (ord($PlainText[$v7 + $v13]) << $v14));
             } while ($v12 < $v8 && $v12 <= 3);
             APX_ProtUpdateContext($ProtContext);
             $v15 = 0;
@@ -469,7 +469,7 @@ function APX_ProtEncrypt_New($Id, $IdLen, $Key, $KeyLen, $PlainText, $PlainTextL
             $v16 = $v10;
             do {
                 $v17 = $v15++;
-                $OutCipherText{$v9 + $v17} = chr($v16 & 0xFF);
+                $OutCipherText[$v9 + $v17] = chr($v16 & 0xFF);
                 $v16 >>= 8;
             } while ($v15 < $v8 && $v15 <= 3);
             if ($v8 <= 4)
@@ -503,7 +503,7 @@ function APX_ProtDecrypt($Id, $IdLen, $Key, $KeyLen, $CipherText, $CipherTextLen
         $v11 = 0;
         if ($v7) {
             do {
-                $v13 = ord($v8{$i + $v11});
+                $v13 = ord($v8[$i + $v11]);
                 $v14 = _INT32(8 * $v11++);
                 $v10 = _INT32($v10 | ($v13 << $v14));
             } while ($v11 < $v7 && $v11 <= 3);
@@ -514,7 +514,7 @@ function APX_ProtDecrypt($Id, $IdLen, $Key, $KeyLen, $CipherText, $CipherTextLen
             $v21 = $v15;
             do {
                 $v18 = $v17++;
-                $OutPlainText{$i + $v18} = chr($v16 & 0xFF);
+                $OutPlainText[$i + $v18] = chr($v16 & 0xFF);
                 // var_dump(dechex(ord($OutPlainText{$i + $v18})));
                 $v16 >>= 8;
             } while ($v17 < $v7 && $v17 <= 3);
@@ -550,7 +550,7 @@ function APX_ProtEncrypt($Id, $IdLen, $Key, $KeyLen, $PlainText, $PlainTextLen, 
         $v11 = 0;
         if ($v7) {
             do {
-                $v13 = ord($v8{$i + $v11});
+                $v13 = ord($v8[$i + $v11]);
                 $v14 = _INT32(8 * $v11++);
                 $v10 = _INT32($v10 | ($v13 << $v14));
             } while ($v11 < $v7 && $v11 <= 3);
@@ -561,7 +561,7 @@ function APX_ProtEncrypt($Id, $IdLen, $Key, $KeyLen, $PlainText, $PlainTextLen, 
             $v20 = $v15;
             do {
                 $v18 = $v17++;
-                $OutCipherText{$i + $v18} = chr($v16 & 0xFF);;
+                $OutCipherText[$i + $v18] = chr($v16 & 0xFF);;
                 $v16 >>= 8;
             } while ($v17 < $v7 && $v17 <= 3);
         } else {
